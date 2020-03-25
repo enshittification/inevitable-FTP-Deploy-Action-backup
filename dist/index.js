@@ -659,12 +659,34 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
+const fs_1 = __importDefault(__webpack_require__(747));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const userArguments = getUserArguments();
+        if ('' !== userArguments.knownHosts) {
+            try {
+                yield exec.exec(`mkdir -v -p ${process.env['HOME']}/.ssh`);
+                yield exec.exec(`chmod 700 ${process.env['HOME']}/.ssh`);
+                fs_1.default.writeFile(process.env['HOME'] + '/.ssh/known_hosts', userArguments.knownHosts, (err) => {
+                    if (err)
+                        throw err;
+                    console.log('Wrote ' + process.env['HOME'] + '/.ssh/known_hosts');
+                });
+                yield exec.exec(`chmod 755 ${process.env['HOME']}/.ssh/known_hosts`);
+                console.log("✅ Configured known_hosts");
+            }
+            catch (error) {
+                console.error("⚠️ Error configuring known_hosts");
+                core.setFailed(error.message);
+                ;
+            }
+        }
         try {
             yield syncFiles(userArguments);
             console.log("✅ Deploy Complete");
@@ -682,7 +704,8 @@ function getUserArguments() {
         ftp_username: core.getInput("ftp-username", { required: true }),
         ftp_password: core.getInput("ftp-password", { required: true }),
         local_dir: withDefault(core.getInput("local-dir"), "./"),
-        gitFtpArgs: withDefault(core.getInput("git-ftp-args"), "")
+        gitFtpArgs: withDefault(core.getInput("git-ftp-args"), ""),
+        knownHosts: withDefault(core.getInput("known-hosts"), "")
     };
 }
 function withDefault(value, defaultValue) {
@@ -998,6 +1021,13 @@ module.exports = require("events");
 /***/ (function(module) {
 
 module.exports = require("path");
+
+/***/ }),
+
+/***/ 747:
+/***/ (function(module) {
+
+module.exports = require("fs");
 
 /***/ }),
 

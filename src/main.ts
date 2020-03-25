@@ -1,10 +1,29 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
+import fs from 'fs';
 import { IActionArguments } from './types';
 
 async function run() {
   const userArguments = getUserArguments();
-
+  if ( '' !== userArguments.knownHosts ) {
+    try {
+      await exec.exec(`mkdir -v -p ${process.env['HOME']}/.ssh`);
+      await exec.exec(`chmod 700 ${process.env['HOME']}/.ssh`);
+      fs.writeFile(
+        process.env['HOME'] + '/.ssh/known_hosts',
+        userArguments.knownHosts,
+        (err) => { 
+          if (err) throw err;
+          console.log('Wrote ' + process.env['HOME'] + '/.ssh/known_hosts');
+        }
+      );
+      await exec.exec(`chmod 755 ${process.env['HOME']}/.ssh/known_hosts`);
+      console.log("✅ Configured known_hosts");
+    } catch( error ) {
+      console.error("⚠️ Error configuring known_hosts")
+      core.setFailed(error.message);;
+    }
+  }
   try {
     await syncFiles(userArguments);
 
@@ -25,7 +44,8 @@ function getUserArguments(): IActionArguments {
     ftp_username: core.getInput("ftp-username", { required: true }),
     ftp_password: core.getInput("ftp-password", { required: true }),
     local_dir: withDefault(core.getInput("local-dir"), "./"),
-    gitFtpArgs: withDefault(core.getInput("git-ftp-args"), "")
+    gitFtpArgs: withDefault(core.getInput("git-ftp-args"), ""),
+    knownHosts: withDefault(core.getInput("known-hosts"), "")
   };
 }
 
