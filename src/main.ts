@@ -10,7 +10,8 @@ const errorDeploying = "⚠️ Error deploying";
 async function run() {
   try {
     const userArguments = getUserArguments();
-    
+   
+    await doDebuggingInfo();
     await configureHost(userArguments);
     await syncFiles(userArguments);
 
@@ -24,30 +25,33 @@ async function run() {
 
 run();
 
+
+async function doDebuggingInfo(): Promise<void> {
+    core.startGroup('Debugging Info');
+    await exec.exec("pwd");
+    await exec.exec("ls -lah");
+    await exec.exec("git status -uno --porcelain'");
+    core.endGroup();
+}
+
 async function configureHost(args: IActionArguments): Promise<void> {
   if (args.knownHosts === "") {
     return;
   }
 
+  const sshFolder = `${process.env['HOME']}/.ssh`;
+  core.startGroup(`Installing ${sshFolder}/known_hosts...`);
   try {
-    const sshFolder = `${process.env['HOME']}/.ssh`;
-
     await exec.exec(`mkdir -v -p ${sshFolder}`);
     await exec.exec(`chmod 700 ${sshFolder}`);
     writeFileAsync(`${sshFolder}/known_hosts`, args.knownHosts);
     await exec.exec(`chmod 755 ${sshFolder}/known_hosts`);
-    console.log("✅ Configured known_hosts");
-
-    await exec.exec("pwd");
-    await exec.exec("ls -lah");
-    await exec.exec("git status -uno --porcelain'");
-    console.log("✅ status checked");
-
   }
   catch (error) {
     console.error("⚠️ Error configuring known_hosts");
     core.setFailed(error.message);
   }
+  core.endGroup();
 }
 
 function getUserArguments(): IActionArguments {
