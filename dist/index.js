@@ -996,7 +996,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const userArguments = getUserArguments();
-            yield doDebuggingInfo();
+            // await doDebuggingInfo();
             yield configureHost(userArguments);
             yield syncFiles(userArguments);
             console.log("✅ Deploy Complete");

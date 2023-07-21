@@ -11,7 +11,7 @@ async function run() {
   try {
     const userArguments = getUserArguments();
    
-    await doDebuggingInfo();
+    // await doDebuggingInfo();
     await configureHost(userArguments);
     await syncFiles(userArguments);
 
