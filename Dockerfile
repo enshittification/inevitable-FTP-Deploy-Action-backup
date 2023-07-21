@@ -1,12 +1,10 @@
-FROM alpine:3.11
+FROM debian:bullseye-slim
 
-LABEL repository="https://github.com/SamKirkland/FTP-Deploy-Action"
-LABEL maintainer="Sam Kirkland <FTP-Deploy-Action@samkirkland.com>"
+LABEL repository="https://github.com/Automattic/FTP-Deploy-Action"
+LABEL maintainer="Automattic <support@automattic.com>"
 
-RUN apk --no-cache add curl bash git nodejs libssh2-dev build-base
 
-RUN curl https://raw.githubusercontent.com/git-ftp/git-ftp/1.6.0/git-ftp > /bin/git-ftp
-RUN chmod 755 /bin/git-ftp
+RUN apt-get update && apt-get install -fqqy git-ftp nodejs && rm -rf /var/lib/apt/lists/*
 
 COPY dist/index.js /deploy.js
 RUN chmod +x deploy.js
