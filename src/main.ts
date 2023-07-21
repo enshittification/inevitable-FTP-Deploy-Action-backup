@@ -69,6 +69,9 @@ function withDefault(value: string, defaultValue: string) {
  */
 async function syncFiles(args: IActionArguments) {
   try {
+    await exec.exec("pwd");
+    await exec.exec("ls -lah");
+    await exec.exec("git status -uno --porcelain'");
     await core.group("Uploading files", async () => {
       return await exec.exec(
         "git ftp push",
