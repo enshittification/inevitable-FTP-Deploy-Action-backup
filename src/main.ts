@@ -27,19 +27,10 @@ run();
 
 
 async function doDebuggingInfo(): Promise<void> {
-    const options = {}
-    options.listeners = {
-      stdout: (data) => {
-        console.log(data)
-      },
-      stderr: (data) => {
-        console.log(data)
-      }
-    }
     core.startGroup('Debugging Info');
-    await exec.exec("pwd", "", options);
-    await exec.exec("ls", ["-lah"], options);
-    await exec.exec("git", ["status", "-uno", "--porcelain"], options);
+    await exec.exec("pwd");
+    await exec.exec("ls", ["-lah"]);
+    await exec.exec("git", ["status", "-uno", "--porcelain"]);
     core.endGroup();
 }
 

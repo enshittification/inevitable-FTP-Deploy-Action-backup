@@ -996,6 +996,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const userArguments = getUserArguments();
+            yield doDebuggingInfo();
             yield configureHost(userArguments);
             yield syncFiles(userArguments);
             console.log("✅ Deploy Complete");
@@ -1007,23 +1008,33 @@ function run() {
     });
 }
 run();
+function doDebuggingInfo() {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.startGroup('Debugging Info');
+        yield exec.exec("pwd");
+        yield exec.exec("ls", ["-lah"]);
+        yield exec.exec("git", ["status", "-uno", "--porcelain"]);
+        core.endGroup();
+    });
+}
 function configureHost(args) {
     return __awaiter(this, void 0, void 0, function* () {
         if (args.knownHosts === "") {
             return;
         }
+        const sshFolder = `${process.env['HOME']}/.ssh`;
+        core.startGroup(`Installing ${sshFolder}/known_hosts...`);
         try {
-            const sshFolder = `${process.env['HOME']}/.ssh`;
             yield exec.exec(`mkdir -v -p ${sshFolder}`);
             yield exec.exec(`chmod 700 ${sshFolder}`);
             writeFileAsync(`${sshFolder}/known_hosts`, args.knownHosts);
             yield exec.exec(`chmod 755 ${sshFolder}/known_hosts`);
-            console.log("✅ Configured known_hosts");
         }
         catch (error) {
             console.error("⚠️ Error configuring known_hosts");
             core.setFailed(error.message);
         }
+        core.endGroup();
     });
 }
 function getUserArguments() {
