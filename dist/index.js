@@ -1013,6 +1013,7 @@ function doDebuggingInfo() {
         core.startGroup('Debugging Info');
         yield exec.exec("pwd");
         yield exec.exec("ls", ["-lah"]);
+        yield exec.exec("git", ["config", "--global", "--add", "safe.directory", "*"]);
         yield exec.exec("git", ["status", "-uno", "--porcelain"]);
         core.endGroup();
     });
@@ -1060,6 +1061,7 @@ function syncFiles(args) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield core.group("Uploading files", () => __awaiter(this, void 0, void 0, function* () {
+                yield exec.exec("git", ["config", "--global", "--add", "safe.directory", "*"]);
                 return yield exec.exec("git ftp push", [
                     "--force",
                     "--auto-init",

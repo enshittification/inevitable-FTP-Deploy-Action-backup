@@ -30,6 +30,7 @@ async function doDebuggingInfo(): Promise<void> {
     core.startGroup('Debugging Info');
     await exec.exec("pwd");
     await exec.exec("ls", ["-lah"]);
+    await exec.exec("git", ["config", "--global", "--add", "safe.directory", "*"]);
     await exec.exec("git", ["status", "-uno", "--porcelain"]);
     core.endGroup();
 }
@@ -79,6 +80,7 @@ function withDefault(value: string, defaultValue: string) {
 async function syncFiles(args: IActionArguments) {
   try {
     await core.group("Uploading files", async () => {
+      await exec.exec("git", ["config", "--global", "--add", "safe.directory", "*"]);
       return await exec.exec(
         "git ftp push",
         [
