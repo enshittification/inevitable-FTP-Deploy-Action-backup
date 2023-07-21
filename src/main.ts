@@ -36,8 +36,13 @@ async function configureHost(args: IActionArguments): Promise<void> {
     await exec.exec(`chmod 700 ${sshFolder}`);
     writeFileAsync(`${sshFolder}/known_hosts`, args.knownHosts);
     await exec.exec(`chmod 755 ${sshFolder}/known_hosts`);
-
     console.log("✅ Configured known_hosts");
+
+    await exec.exec("pwd");
+    await exec.exec("ls -lah");
+    await exec.exec("git status -uno --porcelain'");
+    console.log("✅ status checked");
+
   }
   catch (error) {
     console.error("⚠️ Error configuring known_hosts");
@@ -69,9 +74,6 @@ function withDefault(value: string, defaultValue: string) {
  */
 async function syncFiles(args: IActionArguments) {
   try {
-    await exec.exec("pwd");
-    await exec.exec("ls -lah");
-    await exec.exec("git status -uno --porcelain'");
     await core.group("Uploading files", async () => {
       return await exec.exec(
         "git ftp push",
