@@ -2,7 +2,6 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import fs from 'fs';
 import { promisify } from 'util';
-<<<<<<< HEAD
 import { IActionArguments } from './types';
 
 const writeFileAsync = promisify(fs.writeFile);
@@ -11,6 +10,7 @@ const errorDeploying = "⚠️ Error deploying";
 async function run() {
   try {
     const userArguments = getUserArguments();
+    
     await configureHost(userArguments);
     await syncFiles(userArguments);
 
